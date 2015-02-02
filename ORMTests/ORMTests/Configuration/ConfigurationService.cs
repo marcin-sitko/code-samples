@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenAccessTests.Configuration
+namespace ORMTests.Configuration
 {
     public class ConfigurationService
     {
@@ -20,6 +20,22 @@ namespace OpenAccessTests.Configuration
             }
 
             return connection.ConnectionString;
+        }
+
+        public static string GetMasterDbConnectionString()
+        {
+            var connection = System.Configuration.ConfigurationManager.ConnectionStrings[Configuration.ConfigurationService.ConnectionStringName];
+            if (connection == null)
+            {
+                throw new ApplicationException(string.Format("Connection string with name {0} is not defined", Configuration.ConfigurationService.ConnectionStringName));
+            }
+
+            return connection.ConnectionString;
+        }
+
+        public static string GetTestDbConnectionString()
+        {
+            return string.Format("{0};Initial Catalog={1}", GetMasterDbConnectionString(), Configuration.ConfigurationService.InstanceNameOfTestDatabase);
         }
     }
 }

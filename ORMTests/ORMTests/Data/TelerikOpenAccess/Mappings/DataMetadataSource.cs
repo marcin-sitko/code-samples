@@ -1,14 +1,14 @@
-using OpenAccessTests.Data.Model;
+using ORMTests.Data.TelerikOpenAccess.Model;
 using Telerik.OpenAccess.Metadata.Fluent;
 
-namespace OpenAccessTests.Data.TelerikOpenAccess.Mappings
+namespace ORMTests.Data.TelerikOpenAccess.Mappings
 {
     public class DataMetadataSource : FluentMetadataSource
     {
         protected override System.Collections.Generic.IList<MappingConfiguration> PrepareMapping()
         {
-            MappingConfiguration<Product> productConfiguration = new MappingConfiguration<Product>();
-            productConfiguration.MapType().ToTable("Products");
+            MappingConfiguration<OpenAccessProduct> productConfiguration = new MappingConfiguration<OpenAccessProduct>();
+            productConfiguration.MapType().ToTable("OpenAccess_Products");
             productConfiguration.HasProperty(p => p.Id).IsIdentity();
 
             return new MappingConfiguration[]

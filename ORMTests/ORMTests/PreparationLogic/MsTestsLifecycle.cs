@@ -1,9 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Data.SqlClient;
-using OpenAccessTests.Data.TelerikOpenAccess;
+using ORMTests.Configuration;
+using ORMTests.Data.TelerikOpenAccess;
 
-namespace OpenAccessTests.PreparationLogic
+namespace ORMTests.PreparationLogic
 {
     [TestClass]
     public class MsTestsLifecycle
@@ -14,7 +15,7 @@ namespace OpenAccessTests.PreparationLogic
             DropDatabaseIfExists();
             CreateDatabase();
 
-            using (var dataContext = new DataContext())
+            using (var dataContext = new OpenAccessContext())
             {
                 var schemaHandler = dataContext.GetSchemaHandler();
                 schemaHandler.CreateDatabase();
@@ -22,19 +23,9 @@ namespace OpenAccessTests.PreparationLogic
             }
         }
 
-        public static string GetConnectionString()
+        private static void CreateDatabase()
         {
-            var connection = System.Configuration.ConfigurationManager.ConnectionStrings[Configuration.ConfigurationService.ConnectionStringName];
-            if (connection == null)
-            {
-                throw new ApplicationException(string.Format("Connection string with name {0} is not defined", Configuration.ConfigurationService.ConnectionStringName));
-            }
-
-            return connection.ConnectionString;
-        }
-
-        private static void  CreateDatabase(){
-            using (var sqlConnection = new SqlConnection(GetConnectionString()))
+            using (var sqlConnection = new SqlConnection(ConfigurationService.GetMasterDbConnectionString()))
             {
                 sqlConnection.Open();
 
@@ -46,19 +37,20 @@ namespace OpenAccessTests.PreparationLogic
 
         private static void DropDatabaseIfExists()
         {
+            var dbName = Configuration.ConfigurationService.InstanceNameOfTestDatabase;
             var dropScript = @"
-                IF db_id('" + Configuration.ConfigurationService.InstanceNameOfTestDatabase + @"') IS NOT NULL
+                IF db_id('" + dbName + @"') IS NOT NULL
                 BEGIN
                     DECLARE @kill varchar(8000) = '';
                     SELECT @kill = @kill + 'kill ' + CONVERT(varchar(5), spid) + ';'
                     FROM master..sysprocesses
-                    WHERE dbid = db_id('" + Configuration.ConfigurationService.InstanceNameOfTestDatabase + @"')
+                    WHERE dbid = db_id('" + dbName + @"')
                     EXEC(@kill); 
 
-                    DROP DATABASE " + Configuration.ConfigurationService.InstanceNameOfTestDatabase + @"
+                    DROP DATABASE " + dbName + @"
                 END";
 
-            using (var sqlConnection = new SqlConnection(GetConnectionString()))
+            using (var sqlConnection = new SqlConnection(ConfigurationService.GetMasterDbConnectionString()))
             {
                 sqlConnection.Open();
 
@@ -66,6 +58,6 @@ namespace OpenAccessTests.PreparationLogic
 
                 sqlCommand.ExecuteNonQuery();
             }
-        }
+        }  
     }
 }
