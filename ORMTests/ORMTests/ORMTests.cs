@@ -51,7 +51,7 @@ namespace ORMTests
         }
 
         [TestMethod]
-        public void EntityFramework_ConcurrentlyUpdateTheSameRecord_DbUpdateConcurrencyExceptionShouldBeThrown2()
+        public void EntityFramework_ConcurrentlyUpdateTheSameRecord_DbUpdateConcurrencyExceptionShouldBeThrown()
         {
             //arrange
             var newRecordId = CreateNewEntityFrameworkRecord();
